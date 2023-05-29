@@ -1,5 +1,5 @@
 import express, { Request, Response } from "express";
-
+import cors from "cors";
 interface Task {
   id: number;
   titulo: string;
@@ -12,17 +12,21 @@ const tasks: Task[] = [
   { id: 3, titulo: "Praticar TypeScript", concluida: false },
 ];
 
+let nextTaskId = 4;
+
 const app = express();
+app.use(cors());
 app.use(express.json());
 
 app.get("/tasks", (req: Request, res: Response) => {
   res.json(tasks);
 });
 
-app.post("/tasks", (req: Request, res: Response) => {
-  const newTask: Task = req.body;
+app.post("/tasks", (req, res) => {
+  const newTask = req.body;
+  newTask.id = nextTaskId++;
   tasks.push(newTask);
-  res.sendStatus(201);
+  res.status(201).json(newTask);
 });
 
 app.patch("/tasks/:id", (req: Request, res: Response) => {
